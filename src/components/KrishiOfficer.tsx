@@ -46,7 +46,7 @@ const KrishiOfficer = () => {
       id: '1',
       title: 'Weather Today',
       titleMalayalam: 'ഇന്നത്തെ കാലാവസ്ഥ',
-      content: '28°C, Light Rain Expected',
+      content: '28°C, Light Rain Expected. Good for transplanting paddy seedlings. മഴ പ്രതീക്ഷിക്കുന്നു - നെല്ല് നടാൻ അനുയോജ്യം',
       icon: '🌤️',
       color: 'bg-gradient-sky'
     },
@@ -54,7 +54,7 @@ const KrishiOfficer = () => {
       id: '2',
       title: 'Crop Calendar',
       titleMalayalam: 'വിള കലണ്ടർ',
-      content: 'Rice planting season begins',
+      content: 'Virippu Season: Rice planting optimal. പുതുവയൽ തയ്യാറാക്കാൻ സമയം. Prepare nursery beds, apply organic manure.',
       icon: '🌾',
       color: 'bg-gradient-earth'
     },
@@ -62,7 +62,7 @@ const KrishiOfficer = () => {
       id: '3',
       title: 'Pest Alert',
       titleMalayalam: 'കീടമുന്നറിയിപ്പ്',
-      content: 'Brown plant hopper spotted',
+      content: 'Brown Plant Hopper detected in nearby farms. പുരു ഇലപ്പേൻ കണ്ടു. Use neem-based spray immediately.',
       icon: '🐛',
       color: 'bg-gradient-kerala'
     },
@@ -70,9 +70,41 @@ const KrishiOfficer = () => {
       id: '4',
       title: 'Government Schemes',
       titleMalayalam: 'സർക്കാർ പദ്ധതികൾ',
-      content: 'PM-KISAN subsidy available',
+      content: 'PM-KISAN ₹2000 installment due. ATMA training programs available. കൃഷി വായ്പ അനുമതി ലഭ്യം.',
       icon: '🏛️',
       color: 'bg-gradient-sky'
+    },
+    {
+      id: '5',
+      title: 'Market Prices',
+      titleMalayalam: 'വിപണി വില',
+      content: 'Rice: ₹32/kg ↗️ Coconut: ₹45/piece ↗️ Pepper: ₹650/kg →. കുരുമുളക് വില സ്ഥിരം.',
+      icon: '💰',
+      color: 'bg-gradient-earth'
+    },
+    {
+      id: '6',
+      title: 'Soil Health',
+      titleMalayalam: 'മണ്ണിന്റെ ആരോഗ്യം',
+      content: 'Monsoon leaching detected. Apply lime & organic matter. മണ്ണിന്റെ അസിഡിറ്റി കൂടിയിട്ടുണ്ട്.',
+      icon: '🌱',
+      color: 'bg-gradient-kerala'
+    },
+    {
+      id: '7',
+      title: 'Water Management',
+      titleMalayalam: 'ജല പരിപാലനം',
+      content: 'Reservoir 85% full. Good for direct seeding. പാടത്തിൽ വെള്ളം നിലനിർത്താൻ കാലുകൾ ഉയർത്തുക.',
+      icon: '💧',
+      color: 'bg-gradient-sky'
+    },
+    {
+      id: '8',
+      title: 'Organic Tips',
+      titleMalayalam: 'ജൈവ കൃഷി',
+      content: 'Prepare panchagavya for next week. പഞ്ചഗവ്യ തയ്യാറാക്കുക. Compost ready in 15 days.',
+      icon: '🍃',
+      color: 'bg-gradient-earth'
     }
   ];
 
@@ -180,117 +212,158 @@ const KrishiOfficer = () => {
       <div className="container mx-auto px-4 py-6 max-w-4xl">
         {/* Info Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          {infoCards.map((card) => (
-            <Card key={card.id} className={`${card.color} border-0 shadow-card hover:shadow-warm transition-all duration-300 cursor-pointer`}>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">{card.icon}</div>
-                <h3 className="text-sm font-medium text-white mb-1">{card.title}</h3>
-                <p className="text-xs text-white/80 font-malayalam mb-2">{card.titleMalayalam}</p>
-                <p className="text-xs text-white/90">{card.content}</p>
+          {infoCards.map((card, index) => (
+            <Card 
+              key={card.id} 
+              className={`${card.color} border-0 shadow-card hover:shadow-warm transition-all duration-500 cursor-pointer transform hover:scale-105 animate-slide-up group`}
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              <CardContent className="p-4 text-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-white/10 transform -skew-y-12 scale-0 group-hover:scale-100 transition-transform duration-500"></div>
+                <div className="relative z-10">
+                  <div className="text-2xl mb-2 animate-float" style={{ animationDelay: `${index * 200}ms` }}>
+                    {card.icon}
+                  </div>
+                  <h3 className="text-sm font-semibold text-white mb-1 group-hover:scale-105 transition-transform duration-300">
+                    {card.title}
+                  </h3>
+                  <p className="text-xs text-white/90 font-malayalam mb-2 font-medium">
+                    {card.titleMalayalam}
+                  </p>
+                  <p className="text-xs text-white/95 leading-relaxed line-clamp-3 group-hover:line-clamp-none transition-all duration-300">
+                    {card.content}
+                  </p>
+                </div>
               </CardContent>
             </Card>
           ))}
         </div>
 
         {/* Chat Messages */}
-        <div className="space-y-4 mb-6 max-h-96 overflow-y-auto">
-          {messages.map((message) => (
-            <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-xs md:max-w-md ${
+        <div className="space-y-4 mb-6 max-h-96 overflow-y-auto scroll-smooth">
+          {messages.map((message, index) => (
+            <div 
+              key={message.id} 
+              className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'} animate-slide-up`}
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              <div className={`max-w-xs md:max-w-md transform hover:scale-102 transition-all duration-300 ${
                 message.type === 'user' 
-                  ? 'bg-primary text-primary-foreground' 
-                  : 'bg-card text-card-foreground shadow-card'
-              } rounded-2xl p-4`}>
-                {message.image && (
-                  <img src={message.image} alt="Uploaded" className="w-full rounded-lg mb-2" />
-                )}
-                <p className="text-sm leading-relaxed">{message.content}</p>
+                  ? 'bg-gradient-kerala text-white shadow-warm hover:shadow-card' 
+                  : 'bg-card text-card-foreground shadow-card hover:shadow-warm border border-border/50'
+              } rounded-2xl p-4 relative overflow-hidden group`}>
                 
-                {message.type === 'assistant' && (
-                  <div className="flex items-center justify-between mt-3 pt-2 border-t border-border/50">
-                    <div className="flex space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => provideFeedback(message.id, 'helpful')}
-                        className="h-8 w-8 p-0 hover:bg-accent"
-                      >
-                        <ThumbsUp className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => provideFeedback(message.id, 'loved')}
-                        className="h-8 w-8 p-0 hover:bg-accent"
-                      >
-                        <Heart className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => provideFeedback(message.id, 'not-helpful')}
-                        className="h-8 w-8 p-0 hover:bg-accent"
-                      >
-                        <Frown className="h-3 w-3" />
-                      </Button>
-                    </div>
-                    {message.hasAudio && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => playAudio(message.id)}
-                        className="h-8 w-8 p-0 hover:bg-accent"
-                        disabled={isPlaying}
-                      >
-                        <Volume2 className="h-3 w-3" />
-                      </Button>
-                    )}
-                  </div>
+                {/* Animated background for user messages */}
+                {message.type === 'user' && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                 )}
+                
+                {/* Message content */}
+                <div className="relative z-10">
+                  {message.image && (
+                    <img 
+                      src={message.image} 
+                      alt="Uploaded" 
+                      className="w-full rounded-lg mb-2 animate-scale-in hover:scale-105 transition-transform duration-300" 
+                    />
+                  )}
+                  <p className="text-sm leading-relaxed animate-fade-in">{message.content}</p>
+                  
+                  {message.type === 'assistant' && (
+                    <div className="flex items-center justify-between mt-3 pt-2 border-t border-border/30 animate-fade-in" style={{ animationDelay: '200ms' }}>
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => provideFeedback(message.id, 'helpful')}
+                          className="h-8 w-8 p-0 hover:bg-accent hover:scale-110 transition-all duration-200 group"
+                        >
+                          <ThumbsUp className="h-3 w-3 group-hover:animate-bounce-gentle" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => provideFeedback(message.id, 'loved')}
+                          className="h-8 w-8 p-0 hover:bg-accent hover:scale-110 transition-all duration-200 group"
+                        >
+                          <Heart className="h-3 w-3 group-hover:animate-pulse-soft text-red-500" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => provideFeedback(message.id, 'not-helpful')}
+                          className="h-8 w-8 p-0 hover:bg-accent hover:scale-110 transition-all duration-200 group"
+                        >
+                          <Frown className="h-3 w-3 group-hover:animate-bounce-gentle" />
+                        </Button>
+                      </div>
+                      {message.hasAudio && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => playAudio(message.id)}
+                          className="h-8 w-8 p-0 hover:bg-accent hover:scale-110 transition-all duration-200 group"
+                          disabled={isPlaying}
+                        >
+                          <Volume2 className={`h-3 w-3 ${isPlaying ? 'animate-pulse-soft' : 'group-hover:animate-bounce-gentle'}`} />
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ))}
         </div>
 
         {/* Input Section */}
-        <Card className="shadow-warm">
+        <Card className="shadow-warm hover:shadow-card transition-all duration-300 animate-slide-up border border-border/30">
           <CardContent className="p-4">
             <div className="flex items-end space-x-3">
               <div className="flex-1">
                 <Textarea
                   value={currentMessage}
                   onChange={(e) => setCurrentMessage(e.target.value)}
-                  placeholder="നിങ്ങളുടെ ചോദ്യം എഴുതുക... (Type your question...)"
-                  className="resize-none border-0 bg-muted/50 focus:bg-background transition-colors"
+                  placeholder="നിങ്ങളുടെ ചോദ്യം എഴുതുക... എന്താണ് സഹായം വേണ്ടത്? (Type your question... What help do you need?)"
+                  className="resize-none border-0 bg-muted/50 focus:bg-background transition-all duration-300 focus:shadow-inner rounded-lg"
                   rows={3}
                 />
-                <div className="flex items-center justify-between mt-2">
+                <div className="flex items-center justify-between mt-3 gap-2">
                   <div className="flex space-x-2">
                     <Button
                       variant={isRecording ? "destructive" : "outline"}
                       size="sm"
                       onClick={toggleRecording}
-                      className="gap-2"
+                      className={`gap-2 transition-all duration-300 hover:scale-105 ${
+                        isRecording ? 'animate-pulse-soft shadow-warm' : 'hover:shadow-card'
+                      }`}
                     >
-                      {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                      {isRecording ? 'നിർത്തുക' : 'സംസാരിക്കുക'}
+                      {isRecording ? (
+                        <MicOff className="h-4 w-4 animate-bounce-gentle" />
+                      ) : (
+                        <Mic className="h-4 w-4" />
+                      )}
+                      <span className="hidden md:inline">
+                        {isRecording ? 'നിർത്തുക' : 'സംസാരിക്കുക'}
+                      </span>
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => fileInputRef.current?.click()}
-                      className="gap-2"
+                      className="gap-2 hover:scale-105 transition-all duration-300 hover:shadow-card"
                     >
                       <Camera className="h-4 w-4" />
-                      ചിത്രം
+                      <span className="hidden md:inline">ചിത്രം</span>
                     </Button>
                   </div>
                   <Button 
                     onClick={handleSendMessage}
-                    className="bg-gradient-kerala hover:opacity-90 transition-opacity"
+                    className="bg-gradient-kerala hover:opacity-90 transition-all duration-300 hover:scale-105 shadow-warm hover:shadow-card disabled:opacity-50 disabled:scale-100"
                     disabled={!currentMessage.trim()}
                   >
-                    <Send className="h-4 w-4" />
+                    <Send className={`h-4 w-4 ${currentMessage.trim() ? 'animate-bounce-gentle' : ''}`} />
+                    <span className="ml-2 hidden md:inline">അയക്കുക</span>
                   </Button>
                 </div>
               </div>
@@ -313,16 +386,32 @@ const KrishiOfficer = () => {
         </div>
 
         {/* Support section */}
-        <div className="mt-6 text-center">
-          <Badge variant="secondary" className="mb-2">
+        <div className="mt-8 text-center animate-fade-in" style={{ animationDelay: '500ms' }}>
+          <Badge variant="secondary" className="mb-3 animate-pulse-soft hover:scale-105 transition-transform duration-300">
             സഹായം വേണ്ടേ? (Need help?)
           </Badge>
-          <p className="text-sm text-muted-foreground">
-            എനിക്ക് ഉത്തരം അറിയില്ലെങ്കിൽ, നിങ്ങളെ പ്രാദേശിക ഓഫീസറുമായി ബന്ധിപ്പിക്കാം
-          </p>
-          <p className="text-xs text-muted-foreground">
-            If I don't know the answer, I can connect you with a local officer
-          </p>
+          <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/30 hover:shadow-warm transition-all duration-300">
+            <p className="text-sm text-muted-foreground mb-2 font-malayalam">
+              എനിക്ക് ഉത്തരം അറിയില്ലെങ്കിൽ, നിങ്ങളെ പ്രാദേശിക കൃഷി ഓഫീസറുമായി ബന്ധിപ്പിക്കാം 🤝
+            </p>
+            <p className="text-xs text-muted-foreground mb-3">
+              If I don't know the answer, I can connect you with a local agricultural officer
+            </p>
+            <div className="flex flex-wrap justify-center gap-2 text-xs">
+              <span className="bg-accent/20 text-accent-foreground px-2 py-1 rounded-full">
+                🌾 Crop Guidance
+              </span>
+              <span className="bg-accent/20 text-accent-foreground px-2 py-1 rounded-full">
+                🐛 Pest Control
+              </span>
+              <span className="bg-accent/20 text-accent-foreground px-2 py-1 rounded-full">
+                💰 Market Info
+              </span>
+              <span className="bg-accent/20 text-accent-foreground px-2 py-1 rounded-full">
+                🏛️ Schemes
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
