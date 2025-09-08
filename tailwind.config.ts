@@ -22,6 +22,7 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          hover: "hsl(var(--primary-hover))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -57,6 +58,19 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+      },
+      backgroundImage: {
+        'gradient-kerala': 'var(--gradient-kerala)',
+        'gradient-sky': 'var(--gradient-sky)',
+        'gradient-earth': 'var(--gradient-earth)',
+      },
+      boxShadow: {
+        'warm': 'var(--shadow-warm)',
+        'card': 'var(--shadow-card)',
+      },
+      fontFamily: {
+        'sans': ['Inter', 'system-ui', 'sans-serif'],
+        'malayalam': ['Noto Sans Malayalam', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         lg: "var(--radius)",
