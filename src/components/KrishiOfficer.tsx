@@ -307,6 +307,11 @@ const KrishiOfficer = () => {
           className="hidden"
         />
 
+        {/* ElevenLabs ConvAI Voice Agent */}
+        <div className="mt-6 mb-6">
+          <elevenlabs-convai agent-id="agent_8401k4n6dhc4e5j9tw0e4dwghb7p"></elevenlabs-convai>
+        </div>
+
         {/* Support section */}
         <div className="mt-6 text-center">
           <Badge variant="secondary" className="mb-2">
