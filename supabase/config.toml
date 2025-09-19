@@ -1,1 +1,4 @@
 project_id = "dyjrhrdjxeyslokcgnzu"
+
+[functions.vertex-ai-chat]
+verify_jwt = false

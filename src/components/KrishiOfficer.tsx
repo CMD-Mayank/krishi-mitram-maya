@@ -38,6 +38,8 @@ const KrishiOfficer = () => {
   const [currentMessage, setCurrentMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -108,37 +110,105 @@ const KrishiOfficer = () => {
     }
   ];
 
-  const handleSendMessage = () => {
-    if (!currentMessage.trim()) return;
+  const convertImageToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const base64String = reader.result as string;
+        // Remove the data:image/...;base64, prefix
+        const base64Data = base64String.split(',')[1];
+        resolve(base64Data);
+      };
+      reader.onerror = reject;
+    });
+  };
+
+  const handleSendMessage = async () => {
+    if (!currentMessage.trim() && !uploadedImage) return;
 
     const newMessage: Message = {
       id: Date.now().toString(),
       type: 'user',
-      content: currentMessage,
-      timestamp: new Date()
+      content: currentMessage || (uploadedImage ? 'Image uploaded for analysis' : ''),
+      timestamp: new Date(),
+      image: uploadedImage || undefined
     };
 
     setMessages(prev => [...prev, newMessage]);
     setCurrentMessage('');
+    setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const responses = [
-        'നിങ്ങളുടെ ചോദ്യം മനസ്സിലായി. ഇതിനെ കുറിച്ച് കൂടുതൽ വിവരം തരാം... (I understand your question. Let me provide more information about this...)',
-        'ഇത് വളരെ നല്ല ചോദ്യമാണ്. കൃഷിയിൽ ഇത്തരം പ്രശ്നങ്ങൾ സാധാരണമാണ്... (This is a very good question. Such problems are common in farming...)',
-        'നിങ്ങളുടെ വിളയെ സംബന്ധിച്ച് എനിക്ക് സഹായിക്കാം. ആദ്യം ഇത് പരിശോധിക്കാം... (I can help you regarding your crops. Let\'s first examine this...)'
-      ];
+    try {
+      // Prepare the payload for Vertex AI
+      const payload: any = {
+        userPrompt: currentMessage || 'Please analyze this image and provide farming advice in Malayalam and English',
+        endpointId: 'YOUR_ENDPOINT_ID', // You'll need to provide this
+        projectId: 'YOUR_PROJECT_ID' // You'll need to provide this
+      };
+
+      // Add image if uploaded
+      if (uploadedImage) {
+        // Extract base64 data from the blob URL - this is a simplified approach
+        // In a real app, you'd want to store the original base64 from upload
+        payload.imageBase64 = uploadedImage.includes('data:') ? uploadedImage.split(',')[1] : uploadedImage;
+      }
+
+      // Call the Vertex AI edge function directly
+      const response = await fetch('https://dyjrhrdjxeyslokcgnzu.supabase.co/functions/v1/vertex-ai-chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5anJocmRqeGV5c2xva2Nnbnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODUxNTAsImV4cCI6MjA3Mzg2MTE1MH0.k3eQOYZf7-VmfUvTsGp4D4rXcYGbr_t3TN8jCTSIMzg`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
 
       const aiResponse: Message = {
         id: Date.now().toString(),
         type: 'assistant',
-        content: responses[Math.floor(Math.random() * responses.length)],
+        content: data.message || data.output || 'Response received from AI assistant',
         timestamp: new Date(),
         hasAudio: true
       };
 
       setMessages(prev => [...prev, aiResponse]);
-    }, 1000);
+      
+      if (data.status === 'success') {
+        toast({
+          title: "Response received",
+          description: "AI analysis completed successfully",
+        });
+      }
+
+    } catch (error) {
+      console.error('Error calling Vertex AI:', error);
+      
+      const errorResponse: Message = {
+        id: Date.now().toString(),
+        type: 'assistant',
+        content: 'ക്ഷമിക്കണം, ഇപ്പോൾ ഒരു സാങ്കേതിക പ്രശ്നമുണ്ട്. ദയവായി വീണ്ടും ശ്രമിക്കുക. (Sorry, there\'s a technical issue right now. Please try again.)',
+        timestamp: new Date(),
+        hasAudio: true
+      };
+
+      setMessages(prev => [...prev, errorResponse]);
+      
+      toast({
+        title: "Error",
+        description: "Failed to get AI response. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+      setUploadedImage(null);
+    }
   };
 
   const toggleRecording = () => {
@@ -156,18 +226,26 @@ const KrishiOfficer = () => {
     }
   };
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      const newMessage: Message = {
-        id: Date.now().toString(),
-        type: 'user',
-        content: 'ചിത്രം അപ്‌ലോഡ് ചെയ്തു - ഇത് പരിശോധിക്കാമോ? (Image uploaded - can you check this?)',
-        timestamp: new Date(),
-        image: imageUrl
-      };
-      setMessages(prev => [...prev, newMessage]);
+      try {
+        const base64Data = await convertImageToBase64(file);
+        const imageUrl = URL.createObjectURL(file);
+        setUploadedImage(`data:${file.type};base64,${base64Data}`);
+        
+        toast({
+          title: "Image uploaded",
+          description: "ചിത്രം അപ്‌ലോഡ് ചെയ്തു. ഇപ്പോൾ സന്ദേശം അയയ്ക്കുക. (Image uploaded. Now send your message.)",
+        });
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        toast({
+          title: "Upload error",
+          description: "ചിത്രം അപ്‌ലോഡ് ചെയ്യാൻ കഴിഞ്ഞില്ല (Failed to upload image)",
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -360,10 +438,12 @@ const KrishiOfficer = () => {
                   <Button 
                     onClick={handleSendMessage}
                     className="bg-gradient-kerala hover:opacity-90 transition-all duration-300 hover:scale-105 shadow-warm hover:shadow-card disabled:opacity-50 disabled:scale-100"
-                    disabled={!currentMessage.trim()}
+                    disabled={(!currentMessage.trim() && !uploadedImage) || isLoading}
                   >
-                    <Send className={`h-4 w-4 ${currentMessage.trim() ? 'animate-bounce-gentle' : ''}`} />
-                    <span className="ml-2 hidden md:inline">അയക്കുക</span>
+                    <Send className={`h-4 w-4 ${(currentMessage.trim() || uploadedImage) && !isLoading ? 'animate-bounce-gentle' : ''}`} />
+                    <span className="ml-2 hidden md:inline">
+                      {isLoading ? 'അയക്കുന്നു...' : 'അയക്കുക'}
+                    </span>
                   </Button>
                 </div>
               </div>
