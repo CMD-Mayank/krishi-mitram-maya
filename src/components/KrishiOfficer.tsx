@@ -142,7 +142,9 @@ const KrishiOfficer = () => {
     try {
       // Prepare the payload for Vertex AI
       const payload: any = {
-        userPrompt: currentMessage || 'Please analyze this image and provide farming advice in Malayalam and English'
+        userPrompt: currentMessage || 'Please analyze this image and provide farming advice in Malayalam and English',
+        endpointId: 'YOUR_ENDPOINT_ID', // You'll need to provide this
+        projectId: 'YOUR_PROJECT_ID' // You'll need to provide this
       };
 
       // Add image if uploaded

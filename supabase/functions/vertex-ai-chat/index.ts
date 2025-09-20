@@ -17,25 +17,16 @@ serve(async (req) => {
     
     console.log('Received request:', { userPrompt, hasImage: !!imageBase64, endpointId, projectId });
 
-    // Get Vertex AI configuration from environment
+    // Get Vertex AI access token from environment
     const accessToken = Deno.env.get('VERTEX_AI_ACCESS_TOKEN');
-    const configuredEndpointId = Deno.env.get('VERTEX_AI_ENDPOINT_ID');
-    const configuredProjectId = Deno.env.get('VERTEX_AI_PROJECT_ID');
-    
     if (!accessToken) {
       throw new Error('VERTEX_AI_ACCESS_TOKEN not configured');
     }
-    if (!configuredEndpointId) {
-      throw new Error('VERTEX_AI_ENDPOINT_ID not configured');
-    }
-    if (!configuredProjectId) {
-      throw new Error('VERTEX_AI_PROJECT_ID not configured');
-    }
 
-    // Use configured values
+    // Default values if not provided
     const region = "us-central1";
-    const finalEndpointId = endpointId || configuredEndpointId;
-    const finalProjectId = projectId || configuredProjectId;
+    const finalEndpointId = endpointId || "YOUR_ENDPOINT_ID";
+    const finalProjectId = projectId || "YOUR_PROJECT_ID";
 
     const vertexUrl = `https://${region}-aiplatform.googleapis.com/v1/projects/${finalProjectId}/locations/${region}/endpoints/${finalEndpointId}:predict`;
 
